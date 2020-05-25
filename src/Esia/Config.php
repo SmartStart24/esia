@@ -60,13 +60,8 @@ class Config
         }
 
         $this->privateKeyPath = $config['privateKeyPath'] ?? $this->privateKeyPath;
-        if (!$this->privateKeyPath) {
-            throw new InvalidConfigurationException('Please provide privateKeyPath');
-        }
+
         $this->certPath = $config['certPath'] ?? $this->certPath;
-        if (!$this->certPath) {
-            throw new InvalidConfigurationException('Please provide certPath');
-        }
 
         $this->portalUrl = $config['portalUrl'] ?? $this->portalUrl;
         $this->tokenUrlPath = $config['tokenUrlPath'] ?? $this->tokenUrlPath;
