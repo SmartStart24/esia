@@ -5,6 +5,7 @@ namespace Esia;
 use Esia\Exceptions\AbstractEsiaException;
 use Esia\Exceptions\ForbiddenException;
 use Esia\Exceptions\RequestFailException;
+use Esia\Exceptions\SignerNotFoundException;
 use Esia\Signer\Exceptions\CannotGenerateRandomIntException;
 use Esia\Signer\Exceptions\SignFailException;
 use Esia\Http\GuzzleHttpClient;
@@ -53,12 +54,6 @@ class OpenId
         $this->config = $config;
         $this->client = $client ?? new GuzzleHttpClient(new Client());
         $this->logger = new NullLogger();
-        $this->signer = new SignerPKCS7(
-            $config->getCertPath(),
-            $config->getPrivateKeyPath(),
-            $config->getPrivateKeyPassword(),
-            $config->getTmpPath()
-        );
     }
 
     /**
@@ -93,6 +88,7 @@ class OpenId
      */
     public function buildUrl()
     {
+        $this->checkSigner();
         $timestamp = $this->getTimeStamp();
         $state = $this->buildState();
         $message = $this->config->getScopeString()
@@ -151,6 +147,7 @@ class OpenId
      */
     public function getToken(string $code): string
     {
+        $this->checkSigner();
         $timestamp = $this->getTimeStamp();
         $state = $this->buildState();
 
@@ -398,5 +395,17 @@ class OpenId
         $base64 = strtr($string, '-_', '+/');
 
         return base64_decode($base64);
+    }
+
+    /**
+     * Check signer instance.
+     *
+     * @throws \Esia\Exceptions\SignerNotFoundException
+     */
+    private function checkSigner()
+    {
+        if (empty($this->signer)) {
+            throw new SignerNotFoundException('The object implementing the SignerInterface interface has not been instantiated.');
+        }
     }
 }
