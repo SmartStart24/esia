@@ -168,7 +168,7 @@ class OpenId
             'scope' => $this->config->getScopeString(),
             'timestamp' => $timestamp,
             'token_type' => 'Bearer',
-            'refresh_token' => $state,
+            //'refresh_token' => $state,
         ];
 
         $payload = $this->sendRequest(
